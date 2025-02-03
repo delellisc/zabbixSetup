@@ -115,5 +115,53 @@ Ao clicar no botão "Start", a máquina virtual será inicializada e a tela inic
 ![alt text](./imagens/image-46.png)
 
 ## Configuração do Zabbix
+Abaixo estarão descritos os passos necessários para configurar e disponibilizar o Zabbix na rede.
 
-### Instalação de pacotes necessários
+### Utilizando SSH para conectar à máquina virtual
+Os comandos utilizados no tutorial abaixo podem ser inseridos dentro do terminal da própria máquina virtual, porém, por questões de praticidade, como a possibilidade de copiar e colar comandos, optei por rodar os comandos do meu terminal nativo utilizando SSH. Para fazer isso, primeiramente é preciso verificar se o SSH está instalado na máquina virtual. Isso pode ser feito a partir do comando abaixo:
+
+```sh
+/etc/init.d/ssh status
+```
+
+Caso tenha selecionado as mesmas opções que esse tutorial, a saída esperada deve ser a seguinte:
+![alt text](image.png)
+
+É interessante também verificar se o SSH está instalado em sua máquina, uma vez que algumas distribuições não o possuem instalado nativamente. Essa verificação pode ser feita utilizando o comando anterior. Caso não esteja instalado em nenhuma das situações acima, o serviço pode ser instalado da seguinte maneira:
+
+```sh
+sudo apt-get update # atualizando apt-get
+sudo apt-get install openssh-server # instalação via apt-get
+/etc/init.d/ssh status # verificando status após instalação
+```
+
+Após isso, é preciso cadastrar no VirtualBox o encaminhamento de porta responsável por estabelecer a conexão de um convidado à máquina virtual. 
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
+Após isso, é possível realizar a conexão SSH a partir do comando abaixo:
+```sh
+ssh -p 2222 zadmin@localhost
+```
+
+A saída esperada caso a conexão seja bem sucedida será a seguinte:
+```sh
+The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
+ED25519 key fingerprint is SHA256:Jbw2dV2+tJ7bdl4pFoPSO0qRPHgvE1sOp98X+lo2MOc.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[localhost]:2222' (ED25519) to the list of known hosts.
+zadmin@localhost's password: 
+Linux zabbixm 6.1.0-30-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.124-1 (2025-01-12) x86_64
+[...]
+```
+
+### Instalação usando PostgreSQL
+...
+
+### Instalação usando MySQL
+...
