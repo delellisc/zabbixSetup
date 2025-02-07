@@ -119,13 +119,13 @@ Abaixo estarão descritos os passos necessários para configurar e disponibiliza
 
 ### Alterando a máquina virtual para modo bridge
 O primeiro passo para conectar-se à máquina virtual via SSH será alterar a configuração de rede da máquina virtual para modo brigde. Isso pode ser feito acessando o menu de configurações da máquina virtual desejada:
-![alt text](image-5.png)
+![alt text](./imagens/image-55.png)
 
 Após isso a tela abaixo será exibida, onde deve-se selecionar a opção "Network" ou rede:
-![alt text](image-4.png)
+![alt text](./imagens/image-54.png)
 
 Por padrão a opção "NAT" estará selecionada, no entanto devemos selecionar o modo "Bridge Adapter" deve ser selecionado para que um IP seja atribuído a nossa máquina virtual e ela seja acessada por outras máquinas na rede. Além disso, para que o IP seja atribuído é preciso marcar a opção "Allow All" no campo "Promiscuous Mode":
-![alt text](image-6.png)
+![alt text](./imagens/image-56.png)
 
 ### Utilizando SSH para conectar à máquina virtual
 Os comandos utilizados no tutorial abaixo podem ser inseridos dentro do terminal da própria máquina virtual, porém, por questões de praticidade, como a possibilidade de copiar e colar comandos, optei por rodar os comandos do meu terminal nativo utilizando SSH. Para fazer isso, primeiramente é preciso verificar se o SSH está instalado na máquina virtual. Isso pode ser feito a partir do comando abaixo:
@@ -135,7 +135,7 @@ Os comandos utilizados no tutorial abaixo podem ser inseridos dentro do terminal
 ```
 
 Caso tenha selecionado as mesmas opções que esse tutorial, a saída esperada deve ser a seguinte:
-![alt text](image.png)
+![alt text](./imagens/image-66.png)
 
 É interessante também verificar se o SSH está instalado em sua máquina, uma vez que algumas distribuições não o possuem instalado nativamente. Essa verificação pode ser feita utilizando o comando anterior. Caso não esteja instalado em nenhuma das situações acima, o serviço pode ser instalado da seguinte maneira:
 
@@ -183,11 +183,11 @@ sudo apt-get install openssh-server # instalação via apt-get
 
 Após isso, é preciso cadastrar no VirtualBox o encaminhamento de porta responsável por estabelecer a conexão de um convidado à máquina virtual. 
 
-![alt text](image-1.png)
+![alt text](./imagens/image-6.png)
 
-![alt text](image-2.png)
+![alt text](./imagens/image-52.png)
 
-![alt text](image-3.png)
+![alt text](./imagens/image-53.png)
 
 Após isso, é possível realizar a conexão SSH a partir do comando abaixo:
 ```sh
@@ -346,29 +346,31 @@ systemctl enable zabbix-server zabbix-agent apache2
 ```
 
 Após isso, será possível acessar o front-end do Zabbix a partir de um navegador web e do endereço IP da máquina virtual. No meu caso, sendo 169.254.8.52 o IP da minha máquina virtual, ao acessar o link [169.254.8.52/zabbix](http://169.254.8.52/zabbix/setup.php), a página abaixo é exibida:
-![alt text](image-7.png)
+![alt text](./imagens/image-57.png)
 
 ### Configuração do Web Front-End
 Após completar os passos das etapas anteriores, é possível dar início à configuração do front-end da ferramenta. No meu caso, selecionei a opção de idioma "PT-BR" e cliquei em "Próximo passo":
-![alt text](image-8.png)
+![alt text](./imagens/image-58.png)
 
 Uma tela conferindo os pré-requisitos foi apresentada, mostrando que todos os requisitos estavam satisfeitos:
-![alt text](image-9.png)
+![alt text](./imagens/image-59.png)
 
 Em seguida uma tela requisitando informações do banco de dados foi mostrada. No entanto, caso você tenha seguido os passos descritos nessa documentação e criado o banco de dados e usuário "zabbix", só será necessário informar a senha do usuário:
-![alt text](image-10.png)
+![alt text](./imagens/image-60.png)
 
 Será então exibida uma tela de configurações pedindo o nome do servidor (chamei de zabbixm), o fuso horário e o tema do front-end desejado:
-![alt text](image-11.png)
+![alt text](./imagens/image-61.png)
 
 Após confirmar as configurações, uma tela de sumário será apresentada:
-![alt text](image-12.png)
+![alt text](./imagens/image-62.png)
 
 Ao clicar em próximo passo, a última tela será exibida e a instalação estará completa:
-![alt text](image-13.png)
+![alt text](./imagens/image-63.png)
 
 Ao finalizar a instalação o usuário é levado até a tela de login do sistema. O usuário padrão para o front-end é "Admin" e possui a senha "zabbix":
-![alt text](image-14.png)
+![alt text](./imagens/image-64.png)
 
 Realizando o login, o usuário terá acesso à tela inicial de monitoramento da ferramenta Zabbix:
-![alt text](image-15.png)
+![alt text](./imagens/image-65.png)
+
+## Configurando servidor Zabbix em cluster para prover alta disponibilidade
