@@ -35,83 +35,122 @@ Ao clicar em "Finish", a máquina virtual será criada, sendo disposta na tela i
 Embora a máquina virtual tenha sido criada, sua instalação ainda não foi realizada. Para dar início à instalação, é preciso iniciar a máquina virtual clicando no botão "Start":
 ![alt text](./imagens/c.png)
 
-Ao clicar no botão "Start", a máquina virtual será inicializada e a tela inicial de instalação do Debian será exibida:
+Ao clicar no botão "Start", a máquina virtual será inicializada e a tela inicial de instalação do Debian será exibida. Por opção pessoal, optei pela opção "Install", porém a opção "Graphical Install" possue os mesmos passos descritos abaixo. Para selecionar a opção desejada, é preciso mover a seleção utilizando as setas direcionais do teclado e selecionando através da tecla "Enter":
 ![alt text](./imagens/image-6.png)
 
+A primeira tela do processo de instalação é a de seleção de idioma, que julguei português como a opção mais adequada para esse projeto:
 ![alt text](./imagens/image-7.png)
 
+É possível buscar por um item na lista de valores exibida. Para fazer isso, é preciso apenas digitar em seu teclado o nome da opção. No meu caso, digitei a letra "p" e desci até a opção "Português (Brazil)":
 ![alt text](./imagens/image-8.png)
 
+Como consequência, o sistema já reconhece o Brasil como uma possível localidade. Selecionei portanto "Brasil" como opção quando perguntado qual minha localização:
 ![alt text](./imagens/image-9.png)
 
+A próxima informação que deverá ser fornecida no processo de instalação é o layout do teclado utilizado pela máquina virtual. Caso tenha selecionado as opções acima, a opção de "Português Brasileiro" já será sugerida:
 ![alt text](./imagens/image-10.png)
 
+Após informar essas informações iniciais, outros componentes serão carregados pelo instalador para realizar os próximos passos:
 ![alt text](./imagens/image-11.png)
 
+A primeira informação mais relevante para o processo de instalação será o "hostname" da máquina, ou seja, qual será o nome do máquina, que poderá ser utilizado para identificar a própria na rede. Levando em consideração, optei por nomear minha máquina virtual de "zabbixm" ("Zabbix Machine" ou "Zabbix Máquina") para essa instalação:
 ![alt text](./imagens/image-12.png)
 
+A seguir, é exibida a tela de criação do super usuário para a máquina virtual. No entanto, optei por não criar um super usuário nessa instalação, que é mínima, fazendo com que o usuário comum criado nos prompts a seguir se torne o único usuário do sistema e facilite a nossa vida:
 ![alt text](./imagens/image-13.png)
 
+Em seguida é pedido o domínio de rede a que a máquina pertence. Para essa instalação, esse campo pode ser mantido da forma que nos é exibida. Realizando a instalação em meu computador pessoal, mantive ele em branco:
 ![alt text](./imagens/image-14.png)
 
+Então nos é pedido para informar a que estado pertencemos, a fim de configurar o relógio da máquina com o fuso horário correto. Tendo informado que estamos no Brasil, a lista de valores com todos os estados é mostrado, nos bastando selecionar "Rio Grande do Norte" no nosso caso:
 ![alt text](./imagens/image-15.png)
 
+Finalmente é pedido para criarmos o nosso usuário padrão, que nesse caso dei o nome de Admin, uma vez que será o usuário que logaremos para realizar a configuração do serviço Zabbix posteriormente:
 ![alt text](./imagens/image-16.png)
 
+O seu nome de usuário por sua vez será "zadmin" (Zabbix Admin), uma vez que o nome de usuário "admin" é reservado:
 ![alt text](./imagens/image-17.png)
 
+A senha selecionada por mim para essa instalação foi "2020":
 ![alt text](./imagens/image-18.png)
+OBS.: sinta-se livre para alterar os campos acima.
 
+Com os usuários configurados, finalmente nos é permitido realizar o particionamento do disco a fim de iniciar factualmente o processo de instalação do sistema. Optei por utilizar a opção de particionamento assistido:
 ![alt text](./imagens/image-19.png)
 
+Por questões de boas práticas, como a possível necessidade de redimensionamento do tamanho de disco, optei por selecionar uma opção de particionamento com LVM (Logical Volume Management):
 ![alt text](./imagens/image-21.png)
 
+Em seguida, selecionei o disco virtual em que a máquina deveria ser instalada:
 ![alt text](./imagens/image-22.png)
 
+Como a instalação precisaria de apenas um usuário e da instalação de poucos pacotes para a configuração do serviço, optei pela opção que utiliza apenas uma ```/home``` em uma partição separada, sem separar ```/var``` e ```/tmp```:
 ![alt text](./imagens/image-23.png)
 
+Aparecerá uma tela de confirmação, em que você deverá selecionar a opção "Sim":
 ![alt text](./imagens/image-24.png)
 
+Por fim, aparecerá um campo requisitando o tamanho do grupo de volumes que será gerado a partir do particionamento. A sugestão inicial é baseada no disco virtual gerado no momento de criação da máquina virtual, então selecionei a opção "Continuar" sem alterar nada:
 ![alt text](./imagens/image-25.png)
 
+Será então mostrado um sumário do particionamento, informando os volumes que serão criados e seus detalhes. É preciso então finalizar o processo de particionamento selecionando a opção correspondente:
 ![alt text](./imagens/image-26.png)
 
+Aparecerá uma tela de confirmação, em que a opção "Sim" deverá ser selecionada para realizar as mudanças no disco e dar início aos passos finais da instalação:
 ![alt text](./imagens/image-27.png)
 
+Será iniciada então a instalação básica do sistema:
 ![alt text](./imagens/image-28.png)
 
+Aparecerá uma tela perguntando se deseja-se instalar pacotes adicionais por meio de mídias externas, porém não é relevante para nossa instalação, então seleciona-se a opção "Não":
 ![alt text](./imagens/image-29.png)
 
+Então é gerada a tela de configuração do gerenciador de pacotes, que de início solicita que informemos o páis do espelho (mirror) do repositório Debian: 
 ![alt text](./imagens/image-31.png)
 
+E então nos é solicitado qual o espelho desejado, que na minha instalação foi a opção padrão, "deb.debian.org":
 ![alt text](./imagens/image-32.png)
 
+Nos é perguntado se existe um proxy HTTP que desejamos cadastrar. Para nosso cenário, deixaremos esse campo em branco e daremos continuidade à instalação por meio do botão "Continuar":
 ![alt text](./imagens/image-33.png)
 
+O repositório enfim é configurado:
 ![alt text](./imagens/image-34.png)
 
+Também é dado início à instalação de softwares padrão:
 ![alt text](./imagens/image-35.png)
 
+O instalador então nos pergunta se desejamos fazer parte de uma "pesquisa de popularidade", que prontamente devemos responder que "Não":
 ![alt text](./imagens/image-36.png)
 
+Então nos é mostrado uma tela para seleção de softwares que desejamos incluir na nossa máquina. Por padrão, a interface gráfica GNOME e o ambiente de trabalho Debian estão selecionados. No entanto, para nossa instalação, fora o servidor SSH, nenhum desses pacotes é relevante, que posteriormente será utilizado:
 ![alt text](./imagens/image-37.png)
 
+Por fim será instalado o GRUB em nosso sistema:
 ![alt text](./imagens/image-38.png)
 
+Será perguntado se desejamos instalar o GRUB no disco primário da máquina, que optei por responder com "Sim":
 ![alt text](./imagens/image-39.png)
 
+Será necessário informar qual o dispositivo em que o GRUB deverá ser instalado:
 ![alt text](./imagens/image-40.png)
 
+Então a instalação do bootloader será finalizada:
 ![alt text](./imagens/image-41.png)
 
+Em seguida, a instalação também será finalizada:
 ![alt text](./imagens/image-42.png)
 
+Ao fim da instalação, a seguinte tela será exibida, fazendo com que a máquina virtual seja reiniciada:
 ![alt text](./imagens/image-43.png)
 
+Entraremos então no processo de boot e a tela de seleção do GRUB será mostrada:
 ![alt text](./imagens/image-44.png)
 
+Após selecionar o sistema Debian, nossa máquina por nome "zabbixm" será inicializada:
 ![alt text](./imagens/image-45.png)
 
+Será então possível fazer uso dessa máquina para configurar nosso servidor e disponibilizar o serviço Zabbix.
 ![alt text](./imagens/image-46.png)
 
 ## Configuração do Zabbix
