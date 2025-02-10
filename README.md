@@ -1,6 +1,26 @@
 # Configuração de ambiente Zabbix
 Repositório dedicado à configuração de um ambiente Zabbix para um projeto de alta disponibilidade da matéria de Sistemas Distribuídos.
+<!-- 
+## Informações relevantes para demais grupos
+A máquina Zabbix criada nesse projeto pode ser acessada via comando:
+```sh
+ssh zadmin@192.168.0.108
+```
+OBS.: senha é "2020"
 
+Para ter acesso ao super usuário da máquina, utilizar o comando abaixo:
+```sh
+sudo su
+```
+OBS.: senha é "2020"
+
+Essa página foi criada a partir do README do repositório desse projeto. A biblioteca pandoc foi utilizada:
+```sh
+sudo apt update
+sudo apt install pandoc
+pandoc README.md -c markdown.css -o index.html
+``` 
+-->
 ## Instalação da máquina virtual
 
 ### Download da ISO
@@ -8,7 +28,7 @@ Antes de realizar a instalação da máquina virtual, é preciso selecionar e re
 ![alt text](./imagens/b.png)
 
 ### Criação da máquina no VirtualBox
-Ao abrir o VirtualBox, a seguinte tela irá ser carregada:
+Durante esse processo de informação irei criar uma máquina destinada à execução do serviço Zabbix. No entanto, caso sua intenção seja de criar uma instalação padrão para replicar e instalar outros serviços em máquinas virtuais clonadas, talvez seja interessante nomear a máquina e criar usuário de forma genérica. Ao abrir o VirtualBox, a seguinte tela irá ser carregada:
 ![alt text](./imagens/image.png)
 
 Para criar uma nova máquina virtual, é preciso clicar no botão "New", disposto no menu horizontal com ícones. Após clicar nessa opção, a seguinte tela será exibida:
@@ -55,6 +75,7 @@ Após informar essas informações iniciais, outros componentes serão carregado
 
 A primeira informação mais relevante para o processo de instalação será o "hostname" da máquina, ou seja, qual será o nome do máquina, que poderá ser utilizado para identificar a própria na rede. Levando em consideração, optei por nomear minha máquina virtual de "zabbixm" ("Zabbix Machine" ou "Zabbix Máquina") para essa instalação:
 ![alt text](./imagens/image-12.png)
+OBS.: talvez seja interessante em sua situação nomear essa máquina de forma genérica, a fim de cloná-la e instalar outros serviços, sem a necessidade de passar pelo processo de criação da máquina virtual novamente.
 
 A seguir, é exibida a tela de criação do super usuário para a máquina virtual. No entanto, optei por não criar um super usuário nessa instalação, que é mínima, fazendo com que o usuário comum criado nos prompts a seguir se torne o único usuário do sistema e facilite a nossa vida:
 ![alt text](./imagens/image-13.png)
@@ -125,6 +146,7 @@ O instalador então nos pergunta se desejamos fazer parte de uma "pesquisa de po
 
 Então nos é mostrado uma tela para seleção de softwares que desejamos incluir na nossa máquina. Por padrão, a interface gráfica GNOME e o ambiente de trabalho Debian estão selecionados. No entanto, para nossa instalação, fora o servidor SSH, nenhum desses pacotes é relevante, que posteriormente será utilizado:
 ![alt text](./imagens/image-37.png)
+OBS.: essa tela precisa de muita atenção, uma vez que para desselecionar uma opção, é utilizado a tecla Espaço. A tecla Enter, por sua vez, é responsável por confirmar a seleção de pacotes desejados e dar início à instalação desses pacotes. Atente-se a esse detalhe para não instalar pacotes indesejados!
 
 Por fim será instalado o GRUB em nosso sistema:
 ![alt text](./imagens/image-38.png)
@@ -152,6 +174,8 @@ Após selecionar o sistema Debian, nossa máquina por nome "zabbixm" será inici
 
 Será então possível fazer uso dessa máquina para configurar nosso servidor e disponibilizar o serviço Zabbix.
 ![alt text](./imagens/image-46.png)
+
+OBS.: esse será o momento ideal para clonar a máquina sem nenhum serviço instalado. A partir daqui dará se início à instalação do serviço Zabbix.
 
 ## Configuração do Zabbix
 Abaixo estarão descritos os passos necessários para configurar e disponibilizar o Zabbix na rede.
@@ -413,3 +437,141 @@ Realizando o login, o usuário terá acesso à tela inicial de monitoramento da 
 ![alt text](./imagens/image-65.png)
 
 ## Configurando servidor Zabbix em cluster para prover alta disponibilidade
+
+### Clonando a máquina virtual
+Para a configuração visando alta disponibilidade, será necessária a utilização de dois servidor com Zabbix instalado, uma servindo como servidor ativo do serviço e outra como nó, que deverá ser ativado caso o primeiro servidor não esteja disponível. Para criação da segunda máquina virtual, pode-se realizar o processo de instalação da máquina virtual e configuração do serviço novamente ou, alternativamente, pode-se realizar a clonagem da primeira máquina, uma vez que ela já possui o serviço configurado e executado satisfatóriamente até esse ponto.
+
+Nessa documentação optarei pela segundalt texta opção, realizando a clonagem da máquina virtual dentro do VirtualBox. Isso pode ser feito clicando com o botão direito e na opção "Clone" na máquina virtual desejada na tela inicial do VirtualBox. Ao fazer isso, a seguinte tela será mostrada:
+![alt text](imagens/image-30.png)
+
+As opções selecionadas por padrão já são de nosso interesse, então pode-se clicar na opção "Next" e continuar o processo de clonagem:
+![alt text](imagens/image-47.png)
+
+O VirtualBox então questionará se o clone desejado deve ser um "Clone Completo", em que haverá uma cópia exatada feita, inclusive do disco virtual. Essa é a opção que percisamos, então daremos fim ao processo de clonagem ao clicar em "Finish". Aparecerá no menu inicial uma barra de progresso mostrando o estado no processo:
+![alt text](imagens/image-48.png)
+
+Finalmente teremos acesso à segunda máquina virtual, que assim como a primeira, estará disponível para acesso na página inicial do VirtualBox:
+![alt text](imagens/image-49.png)
+
+### Configuração do servidor nó
+Após isso, pode-se dar início às duas máquinas virtuais, uma vez que será necessário verificar as informações da primeira para cadastrar a segunda como seu nó:
+![alt text](imagens/image-50.png)
+
+É preciso então verificar o IP das máquinas antes de realizar o cadastro:
+![alt text](imagens/image-67.png)
+
+No meu caso, a máquina 1 tem IP 192.168.0.108 e seu clone tem IP 192.168.0.116. Por questão de praticidade, acessarei ambas as máquinas via terminal do meu computador pessoal. Com as duas máquinas em execução e suas informações resgatadas, é possível iniciar o processo de configuração do servidor nó.
+
+Primeiramente configurarei a máquina principal, atribuindo um nome ao seu nó e o seu endereço IP correspondente. Para isso, o arquivo o arquivo ```/etc/zabbix/zabbix_server.conf``` deverá ser alterado:
+```sh
+sudo nano /etc/zabbix/zabbix_server.conf
+```
+
+Devemos então informar o IP da máquina (```192.168.0.108``` no meu caso) e dar um nome para o nó (nomeei de "zbx-node1"). Dentro do arquivo de configuração, em qualquer posição, deve-se adicionar as duas seguintes linhas:
+```sh
+HANodeName=zbx-node1
+NodeAddres=192.168.0.108
+```
+
+De maneira análoga, no clone, o arquivo ```/etc/zabbix/zabbix_server.conf``` também deverá ser alterado:
+```sh
+sudo nano /etc/zabbix/zabbix_server.conf
+```
+
+Mantendo o padrão, da máquina principal, a máquina clone, que tem IP ```192.168.0.116```, terá como nome de seu nó "zbx-node2". Dentro do arquivo de configuração, em qualquer posição, deve-se adicionar as duas seguintes linhas:
+```sh
+HANodeName=zbx-node2
+NodeAddres=192.168.0.116
+```
+
+Essa é a primeira configuração que deverá ser feita em prol da alta disponibilidade. Em seguida, devemos configurar a máquina principal para que suas informações, como o banco de dados, seja acessível para a máquina secundária. O primeiro passo deverá ser a criação de um usuário para a máquina secundária. Para isso, podemos criar um usuário por meio da ferramenta linha de comando do MySQL a partir do comando abaixo:
+```sh
+mysql -uroot -p'2020' -e "create user 'zabbix2'@'192.168.0.116' identified by 'zabbix';"
+mysql -uroot -p'2020' -e "grant all privileges on zabbix.* to zabbix2@192.168.0.116 identified by 'zabbix';"
+```
+
+Sendo o valor após o parâmetro ```-p``` a senha do super usuário, o valor logo após o comando ```create user``` o nome do usuário (zabbix2) e após o @, o endereço IP da máquina que deseja acessar o banco de dados por meio desse usuário, no meu caso, 192.168.0.116. Por fim, ```identified by``` deve ser seguido pela senha do usuário, que por algum motivo eu defini como "zabbix".
+
+Uma peculiaridade do MariaDB é que seu ```bind-address``` está configurado por padrão para o IP 127.0.0.1, impedindo que conexões externas sejam realizadas. dessa forma, precisamos também alterar essa configuração do banco de dados da nossa máquina principal, a fim de deixá-lo acessível para a máquina secundária. Dessa forma, na máquina principal, a partir do comando abaixo será possível acessar e alterar o arquivo de configuração do MariaDB:
+```sh
+nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+
+Dentro do arquivo de configuração, altere a linha a seguir (utilize o comando Crtl+W para pesquisar), inserindo o endereço IP da máquina principal:
+```sh
+bind-address            = 127.0.0.1
+```
+
+Para a seguinte linha:
+```sh
+bind-address            = 192.168.0.108
+```
+
+Na máquina secundária, voltando para a configuração do arquivo ```/etc/zabbix/zabbix_server.conf```, devemos informar as informações que acabamos de definir na máquina principal. Ou seja, devemos alterar os campos condizentes ao banco de dados para que seja possível realizar a conexão:
+```sh
+/etc/zabbix/zabbix_server.conf
+```
+
+Busque pelas linhas abaixo e forneça os valores condizentes:
+```sh
+DBHost=192.168.0.108
+DBName=zabbix
+DBUser=zabbix2
+DBPassword=zabbix
+```
+
+Realizando esses passos, bastará configurar o arquivo ```/etc/zabbix/zabbix_agentd.conf``` da máquina secundária, fornecendo informações sobre o servidor a que ela deve se conectar:
+```sh
+nano /etc/zabbix/zabbix_agentd.conf 
+```
+
+Busque pela linha "Server" utilizando o comando Crtl+W, e achará a seguinte informação:
+```sh
+Server=127.0.0.1
+```
+
+Você deverá então mudar para a seguinte linha:
+```sh
+Server=127.0.0.1,192.168.0.108
+```
+
+A mesma coisa deverá ser feita na linha "ServerActive":
+```sh
+ServerActive=127.0.0.1,192.168.0.108
+```
+
+Por fim, deve-se nomear a máquina secundária preenchendo a linha "Hostname". Optei por nomeá-lo por "Zabbix node server":
+```sh
+Hostname=Zabbix node server
+```
+
+E assim finaliza-se a configuração dentro dos servidores, os próximos passos devem ser feitos na interface gráfica web, que documentarei em breve quando estiver com disponibilidade para realizar registros via print.
+
+# Avaliação
+| Informação | Valor                                                                                    |
+|------------|------------------------------------------------------------------------------------------|
+| Tema       | Alta Disponibilidade de Monitoramento de Recursos com Zabbix                             |
+| Objetivo   | Configurar um ambiente Zabbix para garantir a continuidade do monitoramento de recursos. |
+
+## Descrição das Tarefas
+| Tarefa                                                                                                    | Status |
+|-----------------------------------------------------------------------------------------------------------|--------|
+| Instalar e configurar o Zabbix em um servidor.                                                            | Ok     |
+| Monitorar recursos básicos de ambos os servidores Zabbix, incluindo CPU, memória e disco, como validação. | Ok     |
+| Documentar o processo de configuração e simular cenários de falhas para testar a redundância.             | Ok     |
+| Fornecer painéis demonstrativos no Zabbix com a visão dos recursos monitorados.                           | Ok     |
+
+## Critérios de Avaliação
+| Critério                                                                                                  | Status       |
+|-----------------------------------------------------------------------------------------------------------|--------------|
+| O serviço Zabbix está instalado, configurado e pode ser reiniciado sem erros;                             | Ok           |
+| O serviço Zabbix pode ser acessado pela Interface gráfica do browser;                                     | Ok           |
+| O Zabbix pode ser acessado diretamente por qualquer máquina do laboratório na faixa de IPs: 10.49.0.0/16; | --           |
+| O Zabbix vai utilizar qual protocolo ou métodos para obter as informações dos hosts;                      | Zabbix Agent |
+| Criar uma tela com o diagrama das máquinas da atividade.                                                  | --           |
+
+ 
+ 
+ 
+ 
+ 
