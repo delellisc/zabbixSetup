@@ -636,6 +636,8 @@ De princípio a tag "ZBX" na coluna "Disponibilidade" do nome do host estará ci
 ![alt text](imagens/image-73.png)
 
 Ao clicar no nome do host, o menu flutuante será aberto:
+
+
 ![alt text](imagens/image-74.png)
 
 Se clicarmos na opção "Dashboards", seremos levados para a página abaixo:
