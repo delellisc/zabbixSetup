@@ -564,22 +564,18 @@ sudo apt install zabbix-agent
 ### Instalação do Zabbix Agent caso não se tenha acesso à internet
 O Zabbix disponibiliza pacotes instaláveis dos seus serviços. Sendo assim, podemos previamente baixar um pacote do Zabbix Agent em [zabbix.com](https://www.zabbix.com).
 
-Esse pacote foi disponibilizado nesse repositório em formato [.tar.gz](./zabbix-7.0.10.tar.gz).
+Esse pacote foi disponibilizado nesse repositório em formato [.deb](./zabbix-release_latest_7.2+ubuntu22.04_all.deb).
 
 Portanto, caso a máquina desejada esteja impossibilitada de acessar a internet, podemos copiar o pacote via rede local usando o comando `scp`:
 ```sh
-scp caminho_para_.tar/zabbix-7.0.10.tar.gz usuario_destino@ip_destino:/home/destino
-```
-
-Caso esteja numa instalação mínima e não possua um compilador em C, instale o build-essential:
-```sh
-apt install build-essential -y
+scp caminho_para_.deb/zabbix-release_latest_7.2+ubuntu22.04_all.deb usuario_destino@ip_destino:/home/destino
 ```
 
 Com o instalador em mãos, o serviço Zabbix Agent pode ser instado da seguinte forma:
 ```sh
-tar xzf zabbix_agent-7.0.10-linux-3.0-amd64-static.tar.gz
-./configure --enable-agent
+dpkg -i zabbix-release_latest_7.2+ubuntu22.04_all.deb
+apt update
+apt install zabbix-agent
 ```
 
 ### Configuração na máquina alvo
