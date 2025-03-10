@@ -319,7 +319,7 @@ systemctl restart zabbix-server zabbix-agent apache2
 systemctl enable zabbix-server zabbix-agent apache2
 ```
 
-### Configuração do banco de dados usando MySQL
+<!-- ### Configuração do banco de dados usando MySQL
 Instalação do MariaDB:
 ```sh
 sudo apt install software-properties-common -y
@@ -409,7 +409,7 @@ systemctl enable zabbix-server zabbix-agent apache2
 ```
 
 Após isso, será possível acessar o front-end do Zabbix a partir de um navegador web e do endereço IP da máquina virtual. No meu caso, sendo 169.254.8.52 o IP da minha máquina virtual, ao acessar o link [169.254.8.52/zabbix](http://169.254.8.52/zabbix/setup.php), a página abaixo é exibida:
-![alt text](./imagens/image-57.png)
+![alt text](./imagens/image-57.png) -->
 
 ### Configuração do Web Front-End
 Após completar os passos das etapas anteriores, é possível dar início à configuração do front-end da ferramenta. No meu caso, selecionei a opção de idioma "PT-BR" e cliquei em "Próximo passo":
@@ -436,7 +436,7 @@ Ao finalizar a instalação o usuário é levado até a tela de login do sistema
 Realizando o login, o usuário terá acesso à tela inicial de monitoramento da ferramenta Zabbix:
 ![alt text](./imagens/image-65.png)
 
-## Configurando servidor Zabbix em cluster para prover alta disponibilidade
+<!-- ## Configurando servidor Zabbix em cluster para prover alta disponibilidade
 
 ### Clonando a máquina virtual
 Para a configuração visando alta disponibilidade, será necessária a utilização de dois servidor com Zabbix instalado, uma servindo como servidor ativo do serviço e outra como nó, que deverá ser ativado caso o primeiro servidor não esteja disponível. Para criação da segunda máquina virtual, pode-se realizar o processo de instalação da máquina virtual e configuração do serviço novamente ou, alternativamente, pode-se realizar a clonagem da primeira máquina, uma vez que ela já possui o serviço configurado e executado satisfatóriamente até esse ponto.
@@ -543,9 +543,233 @@ ServerActive=127.0.0.1,192.168.0.108
 Por fim, deve-se nomear a máquina secundária preenchendo a linha "Hostname". Optei por nomeá-lo por "Zabbix node server":
 ```sh
 Hostname=Zabbix node server
-```
+``` -->
 
 E assim finaliza-se a configuração dentro dos servidores, os próximos passos devem ser feitos na interface gráfica web, que documentarei em breve quando estiver com disponibilidade para realizar registros via print.
+
+## Conectar um host ao Zabbix
+Para conectar um host no Zabbix e iniciar seu monitoramento, é preciso instalar o Zabbix Agent no servidor que deseja-se monitorar.
+
+Primeiramente, é preciso realizar o acesso ao servidor desejado:
+```sh
+ssh usuario@ip.do.servidor.desejado
+```
+
+### Instalação do Zabbix Agent caso se tenha acesso à internet
+Caso a máquina em que se deseja instalar o Zabbix Agent possua acesso a internet, sua instalação pode ser realizada por meio do comando abaixo:
+```sh
+sudo apt install zabbix-agent
+```
+
+### Instalação do Zabbix Agent caso não se tenha acesso à internet
+O Zabbix disponibiliza pacotes instaláveis dos seus serviços. Sendo assim, podemos previamente baixar um pacote do Zabbix Agent em [zabbix.com](https://www.zabbix.com).
+
+Esse pacote foi disponibilizado nesse repositório em formato [.tar.gz](./zabbix-7.0.10.tar.gz).
+
+Portanto, caso a máquina desejada esteja impossibilitada de acessar a internet, podemos copiar o pacote via rede local usando o comando `scp`:
+```sh
+scp caminho_para_.tar/zabbix-7.0.10.tar.gz usuario_destino@ip_destino:/home/destino
+```
+
+Caso esteja numa instalação mínima e não possua um compilador em C, instale o build-essential:
+```sh
+apt install build-essential -y
+```
+
+Com o instalador em mãos, o serviço Zabbix Agent pode ser instado da seguinte forma:
+```sh
+tar xzf zabbix_agent-7.0.10-linux-3.0-amd64-static.tar.gz
+./configure --enable-agent
+```
+
+### Configuração na máquina alvo
+Verificar instalação:
+```sh
+systemctl status zabbix-agent
+```
+
+Saída esperada:
+```sh
+● zabbix-agent.service - Zabbix Agent
+     Loaded: loaded (/lib/systemd/system/zabbix-agent.service; enabled; preset: enabled)
+     Active: active (running) since Sun 2025-03-09 19:38:02 -03; 59s ago
+       Docs: man:zabbix_agentd
+   Main PID: 1480 (zabbix_agentd)
+      Tasks: 6 (limit: 2293)
+     Memory: 2.7M
+        CPU: 39ms
+     CGroup: /system.slice/zabbix-agent.service
+             ├─1480 /usr/sbin/zabbix_agentd --foreground
+             ├─1481 "/usr/sbin/zabbix_agentd: collector [idle 1 sec]"
+             ├─1482 "/usr/sbin/zabbix_agentd: listener #1 [waiting for connection]"
+             ├─1483 "/usr/sbin/zabbix_agentd: listener #2 [waiting for connection]"
+             ├─1484 "/usr/sbin/zabbix_agentd: listener #3 [waiting for connection]"
+             └─1485 "/usr/sbin/zabbix_agentd: active checks #1 [idle 1 sec]"
+
+```
+
+Caso a inicialização automática não esteja ativada (`enabled`):
+```sh
+systemctl enable zabbix-server
+```
+
+Primeiramente, deve-se fornecer informações sobre o servidor que realizará o monitoramento, dentro da máquina alvo. Edite o arquivo abaixo:
+```sh
+nano /etc/zabbix/zabbix_agentd.conf 
+```
+
+Busque pela linha "Server" utilizando o comando Crtl+W, e achará a seguinte informação:
+```sh
+Server=127.0.0.1
+```
+
+Você deverá então mudar para a seguinte linha:
+```sh
+Server=127.0.0.1,<ip.maquina.de.monitoramento>
+```
+
+A mesma coisa deverá ser feita na linha "ServerActive":
+```sh
+ServerActive=127.0.0.1,<ip.maquina.de.monitoramento>
+```
+
+Por fim, opcionalmente, pode-se nomear a máquina secundária preenchendo a linha "Hostname":
+```sh
+Hostname=<Nome_do_serviço_da_máquina_alvo>
+```
+
+### Configuração no Web Front-End
+Após realizar os passos anteriores na máquina alvo, deve acessar a interface Web do Zabbix e ir nas opções Monitoramento > Hosts. A tela abaixo será exibida:
+![alt text](imagens/image-68.png)
+
+No topo direito da tela existe o botão "Criar host". Ao clicar no botão, o formulário será gerado:
+![alt text](imagens/image-69.png)
+
+As informações deverão ser preenchidas. Caso seja um servidor Linux a ser monitorado, o template "Linux by Zabbix agent". Já o grupo de hosts deverá ser "Linux servers". Por fim, deve-se clicar em Adicionar abaixo de "Interfaces" e adicionar o IP do servidor alvo. A porta padrão deverá ser mantida. Exemplo de preenchimento:
+![alt text](imagens/image-71.png)
+
+OBS.: O Nome do host precisa ser idêntico ao fornecido na configuração da máquina alvo!
+
+Ao clicar em "Adicionar", um novo host será cadastrado na interface Web e terá seus recursos monitorados!
+![alt text](imagens/image-72.png)
+
+De princípio a tag "ZBX" na coluna "Disponibilidade" do nome do host estará cinza e vazada. Mas ao recarregar, a tag ficará verde novamente:
+![alt text](imagens/image-73.png)
+
+Ao clicar no nome do host, o menu flutuante será aberto:
+![alt text](imagens/image-74.png)
+
+Se clicarmos na opção "Dashboards", seremos levados para a página abaixo:
+![alt text](imagens/image-75.png)
+
+A partir dessa tela podemos navegar e visualizar dados e gráficos sobre os recursos monitorados do host!
+
+## Criação do mapa de hosts
+Após a configuração dos hosts que deverão ser monitorados pelo Zabbix, eles deverão ser adicionados ao "Mapa" chamado "Local Network". Esse mapa consiste de um diagrama, que deve ser manualmente editado, adicionando os elementos presentes na rede local. Para acessar a página de mapas, devemos navegar por Monitoramento > Mapas. A página abaixo deve ser aberta:
+![alt text](imagens/image-76.png)
+
+Para editar o mapa, é preciso clicar no botão que se encontra no canto superior direito da página, "Editar mapa". Ao clicar no botão, a página será levemente alterada, nos dando a oportunidade de modificar o mapa atual (Local Network):
+![alt text](imagens/image-78.png)
+
+Uma barra horizontal contendo o seguinte conteúdo irá aparecer:
+
+"Elemento do mapa: Adicionar/Remover Forma: Adicionar/Remover [...]"
+
+### Adicionar um Host
+Para adicionar um elemento, é preciso clicar na opção "Adicionar" após "Elemento do mapa". Ao clicar nessa opção, uma máquina será adicionada ao mapa:
+![alt text](imagens/image-79.png)
+
+Ao clicar na máquina, o seguinte menu será exibido:
+![alt text](imagens/image-80.png)
+
+Devemos clicar no menu de seleção "Tipo" e selecionar na opção Host:
+![alt text](imagens/image-81.png)
+
+No campo de texto "Host", devemos digitar o nome do host desejado e selecioná-lo:
+![alt text](imagens/image-82.png)
+
+Altere o texto que será exibido no mapa no campo de texto "Texto". Se desejar, altere o ícone do elemento no menu de seleção "Ícones" e no campo "padrão":
+![alt text](imagens/image-83.png)
+
+Para salvar as alterações no mapa, basta clicar na opção "Atualizar" abaixo do menu horizontal com as opções comentadas.
+
+### Adicionar um link (conexão) entre elementos
+Para adicionar um link, a lógica segue a mesma da adição de um elemento. No entanto, é preciso selecionar quais elementos devem ser ligados. Ou seja, devemos selecionar 2 elementos distintos e clicar na opção "Adicionar" na frente de "Link". Para selecionar dois elementos, pode-se segurar o `LShift` e arrastar o cursor do mouse, criando uma área de seleção:
+![alt text](imagens/image-84.png)
+
+Ao soltar a seleção, ambos os elementos estarão selecionados:
+![alt text](imagens/image-85.png)
+
+Por fim, apenas resta clicar na opção de adicionar link. Uma linha verde será traçada entre os elementos:
+![alt text](imagens/image-86.png)
+
+Para salvar as alterações no mapa, basta clicar na opção "Atualizar" abaixo do menu horizontal com as opções comentadas.
+
+## Realizando testes de cenários de falha
+### Falha no Zabbix Server
+Um teste de falha que pode ser realizado no Zabbix Server é o de parar o serviço e observar o comportamento da interface Web:
+```sh
+systemctl stop zabbix-server
+```
+
+Quando o serviço para de rodar, a interface Web deverá indicar que o serviço não está rodando na tela inicial:
+![alt text](imagens/image-87.png)
+![alt text](imagens/image-88.png)
+
+### Falha no Zabbix Agent
+Outro teste que pode ser realizado é a parada do serviço Zabbix Agent. Para simular esse cenário, na máquina monitorada, devemos parar o serviço:
+```sh
+systemctl stop zabbix-agent
+```
+
+Esse cenário deve ser apontado pela interface Web também, informando a indisponibilidade de um host e alterando o status do host selecionado para indisponível:
+![alt text](imagens/image-90.png)
+![alt text](imagens/image-89.png)
+
+### Uso Elevado de CPU no Servidor Zabbix
+Para verificar se o uso elevado de CPU no servidor Zabbix interfere na execução do serviço podemos realizar um teste de estresse. Para isso podemos realizar por meio do "stress-ng", pacote que deve ser instalado com o comando abaixo:
+```sh
+sudo apt install stress-ng
+```
+
+Para realizar o teste de estresse no servidor, executar o comando abaixo:
+```sh
+stress-ng --cpu 8 --timeout 60
+```
+
+Esse teste não interfere na execução do serviço e nem da interface Web. Esse consumo elevado da CPU irá ser apontado no gráfico de uso de CPU na aba de monitoramento do host:
+![alt text](imagens/image-92.png)
+
+### Uso Elevado de CPU no agente Zabbix
+Para realizar o teste de estresse no agente, executar o comando abaixo:
+```sh
+stress-ng --cpu 8 --timeout 60
+```
+
+Esse cenário deve apresentar um pico no uso da CPU no gráfico correspondente na aba de monitoramento do host:
+![alt text](imagens/image-91.png)
+
+### Falha de Espaço em Disco
+Nós podemos realizar um teste de estresse no armazenamento do servidor para verificar seu comportamento quando não há espaço suficiente para escrita:
+```sh
+dd if=/dev/zero of=/tmp/filldisk bs=1M count=100000
+```
+
+Esse cenário deverá causar um disco cheio, que pode ser observado também na aba de monitoramento, dessa vez do servidor Zabbix:
+![alt text](imagens/image-93.png)
+
+Um problema foi identificado durante esse teste. Embora a execução da interface web tenha continuado com êxito, o seguinte erro foi disposto no dashboard da página inicial:
+![alt text](imagens/image-95.png)
+
+Como esperado, nessa situação, em que o servidor hospedando o serviço teve sua /tmp completamente preenchida, ele não será capaz de realizar operações que necessitam de arquivos temporários. No entanto, isso não impede o monitoramento de recursos dos hosts cadastrados.
+
+Para remover o espaço preenchido pelo comando acima, utilizar o comando abaixo:
+```sh
+rm -f /tmp/filldisk
+```
+
+Após esses testes, nós poderemos verificar no gráfico de carga, quando o serviço precisou lidar com a maior carga e verificar seu comportamento nesse espaço de tempo verificando os demais dados:
+![alt text](imagens/image-94.png)
 
 # Avaliação
 | Informação | Valor                                                                                    |
@@ -566,12 +790,6 @@ E assim finaliza-se a configuração dentro dos servidores, os próximos passos 
 |-----------------------------------------------------------------------------------------------------------|--------------|
 | O serviço Zabbix está instalado, configurado e pode ser reiniciado sem erros;                             | Ok           |
 | O serviço Zabbix pode ser acessado pela Interface gráfica do browser;                                     | Ok           |
-| O Zabbix pode ser acessado diretamente por qualquer máquina do laboratório na faixa de IPs: 10.49.0.0/16; | --           |
+| O Zabbix pode ser acessado diretamente por qualquer máquina do laboratório na faixa de IPs: 10.49.0.0/16; | Ok           |
 | O Zabbix vai utilizar qual protocolo ou métodos para obter as informações dos hosts;                      | Zabbix Agent |
-| Criar uma tela com o diagrama das máquinas da atividade.                                                  | --           |
-
- 
- 
- 
- 
- 
+| Criar uma tela com o diagrama das máquinas da atividade.                                                  | Ok           |
