@@ -1,26 +1,7 @@
 # Configuração de ambiente Zabbix
 Repositório dedicado à configuração de um ambiente Zabbix para um projeto de alta disponibilidade da matéria de Sistemas Distribuídos.
+
 <!-- 
-## Informações relevantes para demais grupos
-A máquina Zabbix criada nesse projeto pode ser acessada via comando:
-```sh
-ssh zadmin@192.168.0.108
-```
-OBS.: senha é "2020"
-
-Para ter acesso ao super usuário da máquina, utilizar o comando abaixo:
-```sh
-sudo su
-```
-OBS.: senha é "2020"
-
-Essa página foi criada a partir do README do repositório desse projeto. A biblioteca pandoc foi utilizada:
-```sh
-sudo apt update
-sudo apt install pandoc
-pandoc README.md -c markdown.css -o index.html
-``` 
--->
 ## Instalação da máquina virtual
 
 ### Download da ISO
@@ -141,7 +122,7 @@ O repositório enfim é configurado:
 Também é dado início à instalação de softwares padrão:
 ![alt text](./imagens/image-35.png)
 
-O instalador então nos pergunta se desejamos fazer parte de uma "pesquisa de popularidade", que prontamente devemos responder que "Não":
+O instalador então nos pergunta se desejamos fazer parte de uma "pesquisa de popularidade", que prontamente deve-se responder que "Não":
 ![alt text](./imagens/image-36.png)
 
 Então nos é mostrado uma tela para seleção de softwares que desejamos incluir na nossa máquina. Por padrão, a interface gráfica GNOME e o ambiente de trabalho Debian estão selecionados. No entanto, para nossa instalação, fora o servidor SSH, nenhum desses pacotes é relevante, que posteriormente será utilizado:
@@ -176,8 +157,9 @@ Será então possível fazer uso dessa máquina para configurar nosso servidor e
 ![alt text](./imagens/image-46.png)
 
 OBS.: esse será o momento ideal para clonar a máquina sem nenhum serviço instalado. A partir daqui dará se início à instalação do serviço Zabbix.
+ -->
 
-## Configuração do Zabbix
+## Instalação e Configuração do serviço Zabbix
 Abaixo estarão descritos os passos necessários para configurar e disponibilizar o Zabbix na rede.
 
 ### Alterando a máquina virtual para modo bridge
@@ -187,7 +169,7 @@ O primeiro passo para conectar-se à máquina virtual via SSH será alterar a co
 Após isso a tela abaixo será exibida, onde deve-se selecionar a opção "Network" ou rede:
 ![alt text](./imagens/image-54.png)
 
-Por padrão a opção "NAT" estará selecionada, no entanto devemos selecionar o modo "Bridge Adapter" deve ser selecionado para que um IP seja atribuído a nossa máquina virtual e ela seja acessada por outras máquinas na rede. Além disso, para que o IP seja atribuído é preciso marcar a opção "Allow All" no campo "Promiscuous Mode":
+Por padrão a opção "NAT" estará selecionada, no entanto deve-se selecionar o modo "Bridge Adapter" deve ser selecionado para que um IP seja atribuído a nossa máquina virtual e ela seja acessada por outras máquinas na rede. Além disso, para que o IP seja atribuído é preciso marcar a opção "Allow All" no campo "Promiscuous Mode":
 ![alt text](./imagens/image-56.png)
 
 ### Utilizando SSH para conectar à máquina virtual
@@ -210,7 +192,7 @@ sudo apt-get install openssh-server # instalação via apt-get
 
 Após isso, é possível realizar a conexão SSH a partir do comando abaixo:
 ```sh
-ssh zadmin@169.254.8.52 # sendo 169.254.8.52 o IP atribuído à minha máquina
+ssh usuario@<ip.da.minha.maquina>
 ```
 
 A saída esperada caso a conexão seja bem sucedida será a seguinte:
@@ -226,7 +208,9 @@ Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 [...]
 
 ```
+
 <!-- ### Utilizando SSH para conectar à máquina virtual
+
 Os comandos utilizados no tutorial abaixo podem ser inseridos dentro do terminal da própria máquina virtual, porém, por questões de praticidade, como a possibilidade de copiar e colar comandos, optei por rodar os comandos do meu terminal nativo utilizando SSH. Para fazer isso, primeiramente é preciso verificar se o SSH está instalado na máquina virtual. Isso pode ser feito a partir do comando abaixo:
 
 ```sh
@@ -269,6 +253,7 @@ Linux zabbixm 6.1.0-30-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.124-1 (2025-01-12
 [...]
 ```
  -->
+
 ### Instalação do Zabbix
 Primeiramente é preciso realizar o download do pacote instalador do Zabbix:
 ```sh
@@ -278,16 +263,14 @@ wget https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix
 Depois é realizada a instalação por meio do comando "dpkg" e o parâmetro "-i" e a seguinte sequência de comandos:
 ```sh
 dpkg -i zabbix-release_7.0-2+debian12_all.deb
-sudo apt update
-sudo apt -y install zabbix-server-pgsql php8.2-pgsql zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-asudo 
+apt update
+apt -y install zabbix-server-pgsql php8.2-pgsql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-asudo 
 ```
+OBS.: os comandos desta seção foram executados como superusuário.
 
-OBS.: nesse comando estão sendo instalados pacotes para pgsql e mysql, idealmente deve-se optar por um.
-
-<!-- Instalando o servidor, frontend e agente Zabbix:
-```sh
-apt install  zabbix-frontend-php  zabbix-apache-conf zabbix-sql-scripts zabbix-agent
-``` -->
+<!--
+apt -y install zabbix-server-pgsql php8.2-pgsql zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-asudo 
+OBS.: nesse comando estão sendo instalados pacotes para pgsql e mysql, idealmente deve-se optar por um. -->
 
 ### Configuração do banco de dados usando PostgreSQL
 Assumindo que os comandos anteriores tenham sido rodados selecionando pacotes referentes ao PostgreSQL, pode-se iniciar a criação e configuração do banco de dados. Criando banco de dados PostgreSQL:
@@ -296,7 +279,7 @@ apt install postgresql -y
 su postgres
 ```
 
-Agora, devemos criar um usuário "zabbix" no banco de dados Postgres. Vai pedir para criar uma senha para o user. Lembrar dela, pois vai ser usada posteriormente:
+Agora, deve-se criar um usuário "zabbix" no banco de dados Postgres. Vai pedir para criar uma senha para o user. Lembrar dela, pois vai ser usada posteriormente:
 ```sh
 createuser --pwprompt zabbix
 createdb -0 zabbix zabbix
@@ -467,7 +450,7 @@ Primeiramente configurarei a máquina principal, atribuindo um nome ao seu nó e
 sudo nano /etc/zabbix/zabbix_server.conf
 ```
 
-Devemos então informar o IP da máquina (```192.168.0.108``` no meu caso) e dar um nome para o nó (nomeei de "zbx-node1"). Dentro do arquivo de configuração, em qualquer posição, deve-se adicionar as duas seguintes linhas:
+deve-se então informar o IP da máquina (```192.168.0.108``` no meu caso) e dar um nome para o nó (nomeei de "zbx-node1"). Dentro do arquivo de configuração, em qualquer posição, deve-se adicionar as duas seguintes linhas:
 ```sh
 HANodeName=zbx-node1
 NodeAddres=192.168.0.108
@@ -484,7 +467,7 @@ HANodeName=zbx-node2
 NodeAddres=192.168.0.116
 ```
 
-Essa é a primeira configuração que deverá ser feita em prol da alta disponibilidade. Em seguida, devemos configurar a máquina principal para que suas informações, como o banco de dados, seja acessível para a máquina secundária. O primeiro passo deverá ser a criação de um usuário para a máquina secundária. Para isso, podemos criar um usuário por meio da ferramenta linha de comando do MySQL a partir do comando abaixo:
+Essa é a primeira configuração que deverá ser feita em prol da alta disponibilidade. Em seguida, deve-se configurar a máquina principal para que suas informações, como o banco de dados, seja acessível para a máquina secundária. O primeiro passo deverá ser a criação de um usuário para a máquina secundária. Para isso, pode-se criar um usuário por meio da ferramenta linha de comando do MySQL a partir do comando abaixo:
 ```sh
 mysql -uroot -p'2020' -e "create user 'zabbix2'@'192.168.0.116' identified by 'zabbix';"
 mysql -uroot -p'2020' -e "grant all privileges on zabbix.* to zabbix2@192.168.0.116 identified by 'zabbix';"
@@ -507,7 +490,7 @@ Para a seguinte linha:
 bind-address            = 192.168.0.108
 ```
 
-Na máquina secundária, voltando para a configuração do arquivo ```/etc/zabbix/zabbix_server.conf```, devemos informar as informações que acabamos de definir na máquina principal. Ou seja, devemos alterar os campos condizentes ao banco de dados para que seja possível realizar a conexão:
+Na máquina secundária, voltando para a configuração do arquivo ```/etc/zabbix/zabbix_server.conf```, deve-se informar as informações que acabamos de definir na máquina principal. Ou seja, deve-se alterar os campos condizentes ao banco de dados para que seja possível realizar a conexão:
 ```sh
 /etc/zabbix/zabbix_server.conf
 ```
@@ -545,7 +528,7 @@ Por fim, deve-se nomear a máquina secundária preenchendo a linha "Hostname". O
 Hostname=Zabbix node server
 ``` -->
 
-E assim finaliza-se a configuração dentro dos servidores, os próximos passos devem ser feitos na interface gráfica web, que documentarei em breve quando estiver com disponibilidade para realizar registros via print.
+E assim finaliza-se a configuração dentro do servidor hospedando o serviço Zabbix, os próximos passos devem ser feitos na interface gráfica web.
 
 ## Conectar um host ao Zabbix
 Para conectar um host no Zabbix e iniciar seu monitoramento, é preciso instalar o Zabbix Agent no servidor que deseja-se monitorar.
@@ -555,18 +538,18 @@ Primeiramente, é preciso realizar o acesso ao servidor desejado:
 ssh usuario@ip.do.servidor.desejado
 ```
 
-### Instalação do Zabbix Agent caso se tenha acesso à internet
+### Instalação do Zabbix Agent diretamente no terminal
 Caso a máquina em que se deseja instalar o Zabbix Agent possua acesso a internet, sua instalação pode ser realizada por meio do comando abaixo:
 ```sh
 sudo apt install zabbix-agent
 ```
 
-### Instalação do Zabbix Agent caso não se tenha acesso à internet
-O Zabbix disponibiliza pacotes instaláveis dos seus serviços. Sendo assim, podemos previamente baixar um pacote do Zabbix Agent em [zabbix.com](https://www.zabbix.com).
+### Instalação do Zabbix Agent via .deb
+O Zabbix disponibiliza pacotes instaláveis dos seus serviços. Sendo assim, pode-se previamente baixar um pacote do Zabbix Agent em [zabbix.com](https://www.zabbix.com).
 
 Esse pacote foi disponibilizado nesse repositório em formato [.deb](./zabbix-release_latest_7.2+ubuntu22.04_all.deb).
 
-Portanto, caso a máquina desejada esteja impossibilitada de acessar a internet, podemos copiar o pacote via rede local usando o comando `scp`:
+Portanto, caso não seja possível instalar o pacote com o método anterior na máquina desejada, pode-se copiar o pacote via rede local usando o comando `scp`:
 ```sh
 scp caminho_para_.deb/zabbix-release_latest_7.2+ubuntu22.04_all.deb usuario_destino@ip_destino:/home/destino
 ```
@@ -574,8 +557,8 @@ scp caminho_para_.deb/zabbix-release_latest_7.2+ubuntu22.04_all.deb usuario_dest
 Com o instalador em mãos, o serviço Zabbix Agent pode ser instado da seguinte forma:
 ```sh
 dpkg -i zabbix-release_latest_7.2+ubuntu22.04_all.deb
-apt update
-apt install zabbix-agent
+sudo apt update
+sudo apt install zabbix-agent
 ```
 
 ### Configuração na máquina alvo
@@ -611,7 +594,7 @@ systemctl enable zabbix-server
 
 Primeiramente, deve-se fornecer informações sobre o servidor que realizará o monitoramento, dentro da máquina alvo. Edite o arquivo abaixo:
 ```sh
-nano /etc/zabbix/zabbix_agentd.conf 
+sudo nano /etc/zabbix/zabbix_agentd.conf 
 ```
 
 Busque pela linha "Server" utilizando o comando Crtl+W, e achará a seguinte informação:
@@ -658,7 +641,7 @@ Ao clicar no nome do host, o menu flutuante será aberto:
 Se clicarmos na opção "Dashboards", seremos levados para a página abaixo:
 ![alt text](imagens/image-75.png)
 
-A partir dessa tela podemos navegar e visualizar dados e gráficos sobre os recursos monitorados do host!
+A partir dessa tela pode-se navegar e visualizar dados e gráficos sobre os recursos monitorados do host!
 
 ### Configuração de monitoramento de um serviço Web (como Moodle)
 Com o Zabbix Agent, também é possível realizar o monitoramento de um serviço Web, como o Moodle. Para o nosso cenário, isso pode ser realizado por meio do template Apache via Zabbix Server. A configuração é idêntica à apresentada anteriormente, a única diferença é na tela de configuração, onde deve-se selecionar o template "Apache by Zabbix agent":
@@ -666,11 +649,11 @@ Com o Zabbix Agent, também é possível realizar o monitoramento de um serviço
 
 OBS.: é preciso que o web service e o serviço Apache estejam instalados no servidor monitorado para que os dados sejam retornados.
 
-Se abrirmos o dashboard do host, veremos que os recursos monitorados são diferentes, uma vez que o template é voltado para a coleta de dados relevantes para um serviço web, como quantidade de requisições por segundo, a carga no Workers do serviço e o estado desses Workers:
+Ao abrir o dashboard do host, veremos que os recursos monitorados são diferentes, uma vez que o template é voltado para a coleta de dados relevantes para um serviço web, como quantidade de requisições por segundo, a carga no Workers do serviço e o estado desses Workers:
 ![alt text](imagens/image-97.png)
 
 ## Criação do mapa de hosts
-Após a configuração dos hosts que deverão ser monitorados pelo Zabbix, eles deverão ser adicionados ao "Mapa" chamado "Local Network". Esse mapa consiste de um diagrama, que deve ser manualmente editado, adicionando os elementos presentes na rede local. Para acessar a página de mapas, devemos navegar por Monitoramento > Mapas. A página abaixo deve ser aberta:
+Após a configuração dos hosts que deverão ser monitorados pelo Zabbix, eles deverão ser adicionados ao "Mapa" chamado "Local Network". Esse mapa consiste de um diagrama, que deve ser manualmente editado, adicionando os elementos presentes na rede local. Para acessar a página de mapas, deve-se navegar por Monitoramento > Mapas. A página abaixo deve ser aberta:
 ![alt text](imagens/image-76.png)
 
 Para editar o mapa, é preciso clicar no botão que se encontra no canto superior direito da página, "Editar mapa". Ao clicar no botão, a página será levemente alterada, nos dando a oportunidade de modificar o mapa atual (Local Network):
@@ -687,10 +670,10 @@ Para adicionar um elemento, é preciso clicar na opção "Adicionar" após "Elem
 Ao clicar na máquina, o seguinte menu será exibido:
 ![alt text](imagens/image-80.png)
 
-Devemos clicar no menu de seleção "Tipo" e selecionar na opção Host:
+deve-se clicar no menu de seleção "Tipo" e selecionar na opção Host:
 ![alt text](imagens/image-81.png)
 
-No campo de texto "Host", devemos digitar o nome do host desejado e selecioná-lo:
+No campo de texto "Host", deve-se digitar o nome do host desejado e selecioná-lo:
 ![alt text](imagens/image-82.png)
 
 Altere o texto que será exibido no mapa no campo de texto "Texto". Se desejar, altere o ícone do elemento no menu de seleção "Ícones" e no campo "padrão":
@@ -699,7 +682,7 @@ Altere o texto que será exibido no mapa no campo de texto "Texto". Se desejar, 
 Para salvar as alterações no mapa, basta clicar na opção "Atualizar" abaixo do menu horizontal com as opções comentadas.
 
 ### Adicionar um link (conexão) entre elementos
-Para adicionar um link, a lógica segue a mesma da adição de um elemento. No entanto, é preciso selecionar quais elementos devem ser ligados. Ou seja, devemos selecionar 2 elementos distintos e clicar na opção "Adicionar" na frente de "Link". Para selecionar dois elementos, pode-se segurar o `LShift` e arrastar o cursor do mouse, criando uma área de seleção:
+Para adicionar um link, a lógica segue a mesma da adição de um elemento. No entanto, é preciso selecionar quais elementos devem ser ligados. Ou seja, deve-se selecionar 2 elementos distintos e clicar na opção "Adicionar" na frente de "Link". Para selecionar dois elementos, pode-se segurar o `LShift` e arrastar o cursor do mouse, criando uma área de seleção:
 ![alt text](imagens/image-84.png)
 
 Ao soltar a seleção, ambos os elementos estarão selecionados:
@@ -722,7 +705,7 @@ Quando o serviço para de rodar, a interface Web deverá indicar que o serviço 
 ![alt text](imagens/image-88.png)
 
 ### Falha no Zabbix Agent
-Outro teste que pode ser realizado é a parada do serviço Zabbix Agent. Para simular esse cenário, na máquina monitorada, devemos parar o serviço:
+Outro teste que pode ser realizado é a parada do serviço Zabbix Agent. Para simular esse cenário, na máquina monitorada, deve-se parar o serviço:
 ```sh
 systemctl stop zabbix-agent
 ```
@@ -732,7 +715,7 @@ Esse cenário deve ser apontado pela interface Web também, informando a indispo
 ![alt text](imagens/image-89.png)
 
 ### Uso Elevado de CPU no Servidor Zabbix
-Para verificar se o uso elevado de CPU no servidor Zabbix interfere na execução do serviço podemos realizar um teste de estresse. Para isso podemos realizar por meio do "stress-ng", pacote que deve ser instalado com o comando abaixo:
+Para verificar se o uso elevado de CPU no servidor Zabbix interfere na execução do serviço pode-se realizar um teste de estresse. Para isso pode-se realizar por meio do "stress-ng", pacote que deve ser instalado com o comando abaixo:
 ```sh
 sudo apt install stress-ng
 ```
@@ -755,7 +738,7 @@ Esse cenário deve apresentar um pico no uso da CPU no gráfico correspondente n
 ![alt text](imagens/image-91.png)
 
 ### Falha de Espaço em Disco
-Nós podemos realizar um teste de estresse no armazenamento do servidor para verificar seu comportamento quando não há espaço suficiente para escrita:
+Nós pode-se realizar um teste de estresse no armazenamento do servidor para verificar seu comportamento quando não há espaço suficiente para escrita:
 ```sh
 dd if=/dev/zero of=/tmp/filldisk bs=1M count=100000
 ```
@@ -776,6 +759,28 @@ rm -f /tmp/filldisk
 Após esses testes, nós poderemos verificar no gráfico de carga, quando o serviço precisou lidar com a maior carga e verificar seu comportamento nesse espaço de tempo verificando os demais dados:
 ![alt text](imagens/image-94.png)
 
+# Configuração do ambiente Zabbix no projeto de alta disponibilidade
+A configuração do ambiente Zabbix no projeto de alta disponibilidade foi realizada por meio do pacote Zabbix Agent, que foi instalado e configurado em todos os servidores a serem monitorados, com o processo documentado acima. O servidor contendo o Zabbix possui o endereço de IP 10.49.6.96, informação utilizada para a configuração do Agent, conforme está documentado na seção "Configuração na máquina alvo". Os seguintes servidores foram adicionados como hosts no ambiente de monitoramento do projeto:
+
+| Endereço IP   | Serviço  | Usuário   | Senha     |
+|---------------|----------|-----------|-----------|
+| 10.49.10.10   | HProxy   | debian12  | debian12  |
+| 10.49.10.11   | Moodle 1 | debian12  | debian12  |
+| 10.49.10.12   | Moodle 2 | debian12  | debian12  |
+| 10.49.10.80   | DRDB 1   | aluno     | ifrn.cn   |
+| 10.49.10.81   | DRDB 2   | aluno     | ifrn.cn   |
+| 10.49.6.108   | MariaDB 1| aluno     | ifrn.cn   |
+| 10.49.6.109   | MariaDB 2| aluno     | ifrn.cn   |
+
+Após a configuração, a lista de hosts monitorados pelo Zabbix apresentava os seguintes elementos:
+![alt text](<imagens/image-99.png>)
+
+Com a adição de todos os servidores do projeto, foi possível a criação de um diagrama que representasse a estrutura monitorada, inclusive exibindo o estado e incidentes atuais das máquinas:
+![alt text](<imagens/image-98.png>)
+
+OBS.: É possível observar incidentes abaixo do nome da máquina, como por exemplo, os incidentes relacionadas ao serviço Moodle, que são explicados pelo momento em que o registro foi realizado (16:17, como mostra a imagem), em que o grupo responsável estava passando por momentos de debugging para identificar erros no setup do serviço. 
+
+<!-- 
 # Avaliação
 | Informação | Valor                                                                                    |
 |------------|------------------------------------------------------------------------------------------|
@@ -798,3 +803,4 @@ Após esses testes, nós poderemos verificar no gráfico de carga, quando o serv
 | O Zabbix pode ser acessado diretamente por qualquer máquina do laboratório na faixa de IPs: 10.49.0.0/16; | Ok           |
 | O Zabbix vai utilizar qual protocolo ou métodos para obter as informações dos hosts;                      | Zabbix Agent |
 | Criar uma tela com o diagrama das máquinas da atividade.                                                  | Ok           |
+ -->
