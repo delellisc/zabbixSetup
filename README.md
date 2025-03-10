@@ -668,6 +668,8 @@ A partir dessa tela podemos navegar e visualizar dados e gráficos sobre os recu
 Com o Zabbix Agent, também é possível realizar o monitoramento de um serviço Web, como o Moodle. Para o nosso cenário, isso pode ser realizado por meio do template Apache via Zabbix Server. A configuração é idêntica à apresentada anteriormente, a única diferença é na tela de configuração, onde deve-se selecionar o template "Apache by Zabbix agent":
 ![alt text](imagens/image-96.png)
 
+OBS.: é preciso que o web service e o serviço Apache estejam instalados no servidor monitorado para que os dados sejam retornados.
+
 Se abrirmos o dashboard do host, veremos que os recursos monitorados são diferentes, uma vez que o template é voltado para a coleta de dados relevantes para um serviço web, como quantidade de requisições por segundo, a carga no Workers do serviço e o estado desses Workers:
 ![alt text](imagens/image-97.png)
 
